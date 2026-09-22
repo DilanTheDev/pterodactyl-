@@ -11,7 +11,7 @@ use Pterodactyl\Tests\Integration\Http\HttpTestCase;
 
 class NodeAutoDeployControllerTest extends HttpTestCase
 {
-    public function testGeneratedTokenHasNodeWritePermission(): void
+    public function testGeneratedTokenIsScopedToNodeConfiguration(): void
     {
         $node = Node::factory()->for(Location::factory())->create();
 
@@ -25,6 +25,7 @@ class NodeAutoDeployControllerTest extends HttpTestCase
             ->where('identifier', substr($response->json('token'), 0, ApiKey::IDENTIFIER_LENGTH))
             ->firstOrFail();
 
-        $this->assertSame(AdminAcl::READ | AdminAcl::WRITE, $key->r_nodes);
+        $this->assertSame($node->id, $key->node_id);
+        $this->assertSame(AdminAcl::READ_CONFIGURATION, $key->r_nodes);
     }
 }
