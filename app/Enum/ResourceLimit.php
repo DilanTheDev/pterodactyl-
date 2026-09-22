@@ -24,6 +24,7 @@ enum ResourceLimit
     case Subuser;
     case Websocket;
     case FilePull;
+    case FileArchive;
 
     public function throttleKey(): string
     {
@@ -46,6 +47,10 @@ enum ResourceLimit
             self::Backup => Limit::perMinutes(15, 3),
             self::Database => Limit::perMinute(2),
             self::FilePull => Limit::perMinutes(10, 5),
+            // Compressing and decompressing archives are long-running daemon calls (the Panel
+            // blocks a worker for up to 15 minutes waiting on Wings), so bound how many a single
+            // server can kick off to avoid exhausting the PHP-FPM worker pool.
+            self::FileArchive => Limit::perMinutes(10, 5),
             self::Subuser => Limit::perMinutes(15, 10),
             self::Websocket => Limit::perMinute(5),
             default => Limit::perMinute(2),
