@@ -87,8 +87,10 @@ Route::group([
         Route::put('/rename', [Client\Servers\FileController::class, 'rename']);
         Route::post('/copy', [Client\Servers\FileController::class, 'copy']);
         Route::post('/write', [Client\Servers\FileController::class, 'write']);
-        Route::post('/compress', [Client\Servers\FileController::class, 'compress']);
-        Route::post('/decompress', [Client\Servers\FileController::class, 'decompress']);
+        Route::middleware([ResourceLimit::FileArchive->middleware()])
+            ->post('/compress', [Client\Servers\FileController::class, 'compress']);
+        Route::middleware([ResourceLimit::FileArchive->middleware()])
+            ->post('/decompress', [Client\Servers\FileController::class, 'decompress']);
         Route::post('/delete', [Client\Servers\FileController::class, 'delete']);
         Route::post('/create-folder', [Client\Servers\FileController::class, 'create']);
         Route::post('/chmod', [Client\Servers\FileController::class, 'chmod']);
