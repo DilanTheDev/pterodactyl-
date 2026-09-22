@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
 use Pterodactyl\Models\ApiKey;
 use Illuminate\Http\JsonResponse;
+use Pterodactyl\Services\Acl\Api\AdminAcl;
 use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Pterodactyl\Services\Api\KeyCreationService;
@@ -22,8 +23,8 @@ class NodeAutoDeployController extends Controller
     }
 
     /**
-     * Generates a new API key for the logged-in user with read and write permission
-     * to nodes, and returns that as the deployment key for a node.
+     * Generates a new API key for the logged-in user with only permission to read
+     * node configurations, and returns that as the deployment key for a node.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
@@ -31,18 +32,20 @@ class NodeAutoDeployController extends Controller
     {
         $key = ApiKey::query()
             ->where('user_id', $request->user()->id)
+            ->where('node_id', $node->id)
             ->where('key_type', ApiKey::TYPE_APPLICATION)
-            ->where('r_nodes', 3)
+            ->where('r_nodes', AdminAcl::READ_CONFIGURATION)
             ->first();
 
-        // We couldn't find a key that exists for this user with read and write
-        // permission for nodes. Go ahead and create it now.
+        // We couldn't find a key that exists for this user with only permission for
+        // reading node configurations. Go ahead and create it now.
         if (!$key) {
             $key = $this->keyCreationService->setKeyType(ApiKey::TYPE_APPLICATION)->handle([
                 'user_id' => $request->user()->id,
+                'node_id' => $node->id,
                 'memo' => 'Automatically generated node deployment key.',
                 'allowed_ips' => [],
-            ], ['r_nodes' => 3]);
+            ], ['r_nodes' => AdminAcl::READ_CONFIGURATION]);
         }
 
         return new JsonResponse([

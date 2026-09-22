@@ -19,6 +19,7 @@ class AdminAcl
     public const NONE = 0;
     public const READ = 1;
     public const WRITE = 2;
+    public const READ_CONFIGURATION = 4;
 
     /**
      * Resources that are available on the API and can contain a permissions

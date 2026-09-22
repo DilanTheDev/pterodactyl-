@@ -24,6 +24,8 @@ enum ResourceLimit
     case Subuser;
     case Websocket;
     case FilePull;
+    case Compress;
+    case Decompress;
 
     public function throttleKey(): string
     {
@@ -46,6 +48,10 @@ enum ResourceLimit
             self::Backup => Limit::perMinutes(15, 3),
             self::Database => Limit::perMinute(2),
             self::FilePull => Limit::perMinutes(10, 5),
+            // Compressing and decompressing archives block a request worker synchronously
+            // for up to 15 minutes each (see DaemonFileRepository), so cap how frequently a
+            // single server can start them to avoid exhausting the request worker pool.
+            self::Compress, self::Decompress => Limit::perMinutes(10, 5),
             self::Subuser => Limit::perMinutes(15, 10),
             self::Websocket => Limit::perMinute(5),
             default => Limit::perMinute(2),

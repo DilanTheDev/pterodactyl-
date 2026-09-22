@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *
  * @property int $id
  * @property int $user_id
+ * @property int|null $node_id
  * @property int $key_type
  * @property string $identifier
  * @property string $token
@@ -103,6 +104,7 @@ class ApiKey extends Model implements HasAbilities
     protected $casts = [
         'allowed_ips' => 'array',
         'user_id' => 'int',
+        'node_id' => 'int',
         'last_used_at' => 'datetime',
         'expires_at' => 'datetime',
         self::CREATED_AT => 'datetime',
@@ -147,6 +149,7 @@ class ApiKey extends Model implements HasAbilities
         'memo' => 'required|nullable|string|max:500',
         'allowed_ips' => 'nullable|array',
         'allowed_ips.*' => 'string',
+        'node_id' => 'nullable|exists:nodes,id',
         'last_used_at' => 'nullable|date',
         'expires_at' => 'nullable|date',
         'r_' . AdminAcl::RESOURCE_USERS => 'integer|min:0|max:3',
@@ -156,7 +159,7 @@ class ApiKey extends Model implements HasAbilities
         'r_' . AdminAcl::RESOURCE_EGGS => 'integer|min:0|max:3',
         'r_' . AdminAcl::RESOURCE_LOCATIONS => 'integer|min:0|max:3',
         'r_' . AdminAcl::RESOURCE_NESTS => 'integer|min:0|max:3',
-        'r_' . AdminAcl::RESOURCE_NODES => 'integer|min:0|max:3',
+        'r_' . AdminAcl::RESOURCE_NODES => 'integer|min:0|max:7',
         'r_' . AdminAcl::RESOURCE_SERVERS => 'integer|min:0|max:3',
     ];
 

@@ -63,6 +63,7 @@ DROP TABLE IF EXISTS `api_keys`;
 CREATE TABLE `api_keys` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
+  `node_id` int(10) unsigned DEFAULT NULL,
   `key_type` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `identifier` char(16) DEFAULT NULL,
   `token` text NOT NULL,
@@ -84,6 +85,8 @@ CREATE TABLE `api_keys` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `api_keys_identifier_unique` (`identifier`),
   KEY `api_keys_user_id_foreign` (`user_id`),
+  KEY `api_keys_node_id_foreign` (`node_id`),
+  CONSTRAINT `api_keys_node_id_foreign` FOREIGN KEY (`node_id`) REFERENCES `nodes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `api_keys_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -876,3 +879,4 @@ INSERT INTO `migrations` VALUES (191,'2022_08_16_230204_add_installed_at_column_
 INSERT INTO `migrations` VALUES (192,'2022_12_12_213937_update_mail_settings_to_new_format',1);
 INSERT INTO `migrations` VALUES (193,'2023_01_24_210051_add_uuid_column_to_failed_jobs_table',1);
 INSERT INTO `migrations` VALUES (194,'2023_02_23_191004_add_expires_at_column_to_api_keys_table',1);
+INSERT INTO `migrations` VALUES (195,'2026_06_23_205500_add_node_id_to_api_keys_table',1);
